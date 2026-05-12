@@ -1,0 +1,59 @@
+Analisis Kebutuhan Toko Bangunan — CodeIgniter 4
+================================================
+
+Persyaratan: PHP 8.1+, MySQL/MariaDB (XAMPP), Composer (vendor).
+
+Skema DB mengikuti dump `db_inventaris`: tabel kategori, satuan, supplier, pengguna,
+barang, barang_masuk, barang_keluar. Login memakai field username + password (bcrypt).
+
+1) Letak folder
+   - Disarankan: proyek di C:\xampp\htdocs\tokobangunan
+   - URL aplikasi: folder public — contoh http://localhost/tokobangunan/public/
+
+2) Apache
+   - Aktifkan mod_rewrite di XAMPP.
+   - Sesuaikan public/.htaccess (RewriteBase) jika path berbeda.
+
+3) Database
+   Opsi A — impor SQL (phpMyAdmin / CLI):
+      - Buat database db_inventaris (atau nama lain).
+      - Impor file db_inventaris.sql Anda.
+      - Di .env sesuaikan: database.default.database, hostname, username, password.
+      - Tidak perlu migrate jika struktur sama dengan migration CI;
+        jika menggunakan migrate:fresh di DB yang sudah di-impor, data akan terhapus.
+
+   Opsi B — migrasi + seeder proyek:
+      - Buat database kosong (mis. db_inventaris).
+      - Edit .env (koneksi MySQL).
+      - Dari folder proyek:
+            php spark migrate
+            php spark db:seed DatabaseSeeder
+        Selalu sebut DatabaseSeeder: `php spark db:seed DatabaseSeeder`
+        (tanpa argumen CLI bisa menunggu input).
+
+4) app.baseURL
+   - Contoh: app.baseURL = 'http://localhost/tokobangunan/public/'
+
+5) Akun demo (setelah db:seed DatabaseSeeder)
+   - Admin:   username admin   / admin123
+   - Petugas: username petugas / petugas123
+
+   Jika Anda hanya meng-impor SQL lawas tanpa bcrypt, login bisa gagal sampai password
+   di-reset (mis. update manual di tabel pengguna atau gunakan seeder migrate:fresh).
+
+6) Alternatif php spark serve
+   - Sesuaikan app.baseURL ke http://localhost:8080/ (atau port yang dipakai).
+
+7) Role
+   - admin: akses penuh termasuk pengguna.
+   - petugas: kategori, satuan, supplier, barang, barang masuk/keluar, laporan.
+
+8) Laporan PDF (DomPDF)
+   - Halaman pusat laporan (setelah login): /reports
+   - Endpoint: /reports/stock-pdf, /reports/sales-pdf, /reports/forecast-pdf,
+               /reports/inbound-pdf, /reports/outbound-pdf
+   - Filter tanggal (keluar/masuk): ?from=YYYY-MM-DD&to=YYYY-MM-DD
+
+9) Harga & stok
+   - Stok pada barang; harga beli/jual utama pada barang_masuk / barang_keluar per transaksi.
+   - Nilai inventaris referensi dashboard: stok × harga beli dari pembelian terakhir per barang.
