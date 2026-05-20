@@ -15,8 +15,16 @@ class RolesFilter implements FilterInterface
             return redirect()->to('/login')->with('error', 'Silakan masuk terlebih dahulu.');
         }
 
-        $allowedRaw = $arguments[0] ?? '';
-        $allowed    = array_filter(array_map('trim', explode(',', (string) $allowedRaw)));
+        $allowed = [];
+        foreach ($arguments ?? [] as $arg) {
+            foreach (explode(',', (string) $arg) as $role) {
+                $role = trim($role);
+                if ($role !== '') {
+                    $allowed[] = $role;
+                }
+            }
+        }
+        $allowed = array_values(array_unique($allowed));
 
         if ($allowed === []) {
             return null;

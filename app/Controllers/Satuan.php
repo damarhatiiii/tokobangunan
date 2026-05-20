@@ -15,18 +15,7 @@ class Satuan extends BaseController
 
     public function index()
     {
-        $q = (string) $this->request->getGet('q');
-        $b = $this->model->orderBy('nama_satuan', 'ASC');
-        if ($q !== '') {
-            $b = $b->search($q);
-        }
-
-        return view('satuan/index', [
-            'title' => 'Satuan Barang',
-            'q'     => $q,
-            'rows'  => $b->paginate(15),
-            'pager' => $this->model->pager,
-        ]);
+        return redirect()->to('/categories');
     }
 
     public function create()
@@ -45,7 +34,7 @@ class Satuan extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->model->errors());
         }
 
-        return redirect()->to('/satuan')->with('message', 'Satuan disimpan.');
+        return redirect()->to('/categories')->with('message', 'Satuan disimpan.');
     }
 
     public function edit(int $id)
@@ -73,7 +62,7 @@ class Satuan extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->model->errors());
         }
 
-        return redirect()->to('/satuan')->with('message', 'Satuan diperbarui.');
+        return redirect()->to('/categories')->with('message', 'Satuan diperbarui.');
     }
 
     public function delete(int $id)
@@ -85,9 +74,9 @@ class Satuan extends BaseController
         try {
             $this->model->delete($id);
         } catch (\Throwable $e) {
-            return redirect()->to('/satuan')->with('error', 'Satuan masih digunakan barang.');
+            return redirect()->to('/categories')->with('error', 'Satuan masih digunakan barang.');
         }
 
-        return redirect()->to('/satuan')->with('message', 'Satuan dihapus.');
+        return redirect()->to('/categories')->with('message', 'Satuan dihapus.');
     }
 }

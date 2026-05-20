@@ -1,68 +1,89 @@
-# CodeIgniter 4 Application Starter
+# Toko Bangunan — Sistem Inventori
 
-## What is CodeIgniter?
+Aplikasi inventori toko bangunan berbasis **CodeIgniter 4** (PHP 8.1+): barang, stok, supplier, transaksi masuk/keluar, laporan, dan master data.
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+## Instalasi
 
-This repository holds a composer-installable app starter.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+1. `composer install`
+2. Salin `env` ke `.env`, sesuaikan `app.baseURL` dan koneksi database
+3. Migrasi & seed: `php spark migrate` lalu `php spark db:seed DatabaseSeeder`
+4. Arahkan virtual host ke folder `public/`
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
+## Struktur modul Kategori & Satuan
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
+Master **kategori** dan **satuan** dikelola dalam **satu halaman** (`/categories`). Dokumentasi lengkap (diagram, rute, parameter, skema DB):
 
-## Installation & updates
+→ **[docs/STRUKTUR-KATEGORI-SATUAN.md](docs/STRUKTUR-KATEGORI-SATUAN.md)**
 
-`composer create-project codeigniter4/appstarter` then `composer update` whenever
-there is a new release of the framework.
+Ringkasan:
 
-When updating, check the release notes to see if there are any changes you might need to apply
-to your `app` folder. The affected files can be copied or merged from
-`vendor/codeigniter4/framework/app`.
+| Lapisan | Berkas utama |
+|---------|----------------|
+| Controller | `app/Controllers/Categories.php`, `app/Controllers/Satuan.php` |
+| Model | `app/Models/CategoryModel.php`, `app/Models/SatuanModel.php` |
+| View | `app/Views/categories/index.php` (gabungan), `form.php`, `app/Views/satuan/form.php` |
 
-## Setup
+## Pengujian whitebox
 
-Copy `env` to `.env` and tailor for your app, specifically the baseURL
-and any database settings.
+Pengujian **whitebox** memeriksa logika internal (model, controller, redirect, filter auth) tanpa UI manual. Database uji memakai **SQLite in-memory** (`app/Config/Database.php` → grup `tests`).
 
-## Important Change with index.php
+### Prasyarat PHPUnit
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+Aktifkan ekstensi **sqlite3** di `php.ini` (XAMPP: hapus `;` pada baris `extension=sqlite3`), lalu restart Apache/PHP.
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+```bash
+php -m | findstr sqlite3
+```
 
-**Please** read the user guide for a better explanation of how CI4 works!
+### Menjalankan tes
 
-## Repository Management
+```bash
+composer install
+php -d extension=sqlite3 vendor\bin\phpunit
+```
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+Hanya modul kategori & satuan:
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
+```bash
+php -d extension=sqlite3 vendor\bin\phpunit tests/unit/CategoryModelTest.php tests/unit/SatuanModelTest.php tests/feature/CategoriesFeatureTest.php tests/feature/SatuanFeatureTest.php
+```
 
-## Server Requirements
+> Jika `sqlite3` sudah aktif permanen di `php.ini`, flag `-d extension=sqlite3` tidak diperlukan.
 
-PHP version 8.1 or higher is required, with the following extensions installed:
+### Matriks whitebox
 
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
+| ID | Kelas uji | Metode | Yang diuji (jalur internal) |
+|----|-----------|--------|-----------------------------|
+| W-KM-01 | `CategoryModelTest` | `testSearchFiltersByNamaKategori` | `CategoryModel::search()` + `like('nama_kategori')` |
+| W-KM-02 | `CategoryModelTest` | `testInsertRejectsNamaTerlaluPendek` | Aturan validasi `min_length[2]` |
+| W-KM-03 | `CategoryModelTest` | `testInsertValidDataPersists` | `insert()` + `find()` |
+| W-SM-01 | `SatuanModelTest` | `testSearchFiltersByNamaSatuan` | `SatuanModel::search()` |
+| W-SM-02 | `SatuanModelTest` | `testAsMapReturnsIdToNama` | `SatuanModel::asMap()` untuk dropdown |
+| W-SM-03 | `SatuanModelTest` | `testInsertRejectsEmptyNama` | Validasi `required` |
+| W-CF-01 | `CategoriesFeatureTest` | `testIndexRequiresLogin` | `AuthFilter` → redirect `/login` |
+| W-CF-02 | `CategoriesFeatureTest` | `testIndexRendersCombinedPage` | `Categories::index` mengirim `kategori` + `satuan` ke view |
+| W-CF-03 | `CategoriesFeatureTest` | `testIndexFiltersKategoriWithQk` | Cabang `qk !== ''` → `search($qk)` |
+| W-CF-04 | `CategoriesFeatureTest` | `testIndexFiltersSatuanWithQs` | Cabang `qs !== ''` → `search($qs)` |
+| W-CF-05 | `CategoriesFeatureTest` | `testStoreRedirectsToCategoriesOnSuccess` | `Categories::store` → redirect + flash `message` |
+| W-SF-01 | `SatuanFeatureTest` | `testIndexRedirectsToCategories` | `Satuan::index` → `redirect('/categories')` |
+| W-SF-02 | `SatuanFeatureTest` | `testStoreRedirectsToCategoriesOnSuccess` | `Satuan::store` → `/categories` |
+| W-SF-03 | `SatuanFeatureTest` | `testUpdateRedirectsToCategoriesOnSuccess` | `Satuan::update` → `/categories` |
 
-> [!WARNING]
-> - The end of life date for PHP 7.4 was November 28, 2022.
-> - The end of life date for PHP 8.0 was November 26, 2023.
-> - If you are still using PHP 7.4 or 8.0, you should upgrade immediately.
-> - The end of life date for PHP 8.1 will be December 31, 2025.
+### Dukungan tes
 
-Additionally, make sure that the following extensions are enabled in your PHP:
+| Berkas | Peran |
+|--------|--------|
+| `tests/_support/MasterDataTestCase.php` | Migrasi, seed, session petugas |
+| `tests/_support/Database/Migrations/2026-05-19-100000_KategoriSatuanTables.php` | Tabel `kategori`, `satuan` di SQLite uji |
+| `tests/_support/Database/Seeds/MasterDataSeeder.php` | Data contoh (Semen, Besi, PCS, zak, …) |
 
-- json (enabled by default - don't turn it off)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+Panduan umum PHPUnit CI4: [tests/README.md](tests/README.md).
+
+## Persyaratan server
+
+- PHP 8.1+, ekstensi `intl`, `mbstring`, `json`
+- MySQL/MariaDB (produksi); SQLite3 untuk PHPUnit
+
+## Lisensi
+
+MIT (CodeIgniter 4 App Starter).
