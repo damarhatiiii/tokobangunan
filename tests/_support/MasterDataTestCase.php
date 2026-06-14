@@ -15,7 +15,7 @@ abstract class MasterDataTestCase extends CIUnitTestCase
 
     protected $refresh     = true;
     protected $migrate     = true;
-    protected $namespace   = 'Tests\Support';
+    protected $namespace   = 'App';
     protected $seed        = MasterDataSeeder::class;
 
     protected function setUp(): void
