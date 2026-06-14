@@ -30,7 +30,7 @@ class Profile extends BaseController
         }
 
         $nama     = (string) $this->request->getPost('nama_pengguna');
-        $username = (string) $this->request->getPost('username');
+        $username = trim((string) $this->request->getPost('username'));
         $pass     = (string) $this->request->getPost('password');
         $pass2    = (string) $this->request->getPost('password_confirm');
 

@@ -55,7 +55,7 @@ class Users extends BaseController
         }
 
         $this->model->insert([
-            'username'      => $this->request->getPost('username'),
+            'username'      => trim((string) $this->request->getPost('username')),
             'password'      => $this->model->hashPassword((string) $this->request->getPost('password')),
             'nama_pengguna' => $this->request->getPost('nama_pengguna'),
             'role'          => $this->request->getPost('role'),
@@ -102,7 +102,7 @@ class Users extends BaseController
         }
 
         $data = [
-            'username'      => $this->request->getPost('username'),
+            'username'      => trim((string) $this->request->getPost('username')),
             'nama_pengguna' => $this->request->getPost('nama_pengguna'),
             'role'          => $this->request->getPost('role'),
             'status_aktif'  => (int) $this->request->getPost('status_aktif'),

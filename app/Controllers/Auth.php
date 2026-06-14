@@ -28,7 +28,7 @@ class Auth extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        $username = (string) $this->request->getPost('username');
+        $username = trim((string) $this->request->getPost('username'));
         $password = (string) $this->request->getPost('password');
 
         $model = new PenggunaModel();
