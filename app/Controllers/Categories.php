@@ -3,29 +3,40 @@
 namespace App\Controllers;
 
 use App\Models\CategoryModel;
+use App\Models\SatuanModel;
 
 class Categories extends BaseController
 {
     protected CategoryModel $model;
+    protected SatuanModel $satuanModel;
 
     public function __construct()
     {
-        $this->model = new CategoryModel();
+        $this->model       = new CategoryModel();
+        $this->satuanModel = new SatuanModel();
     }
 
     public function index()
     {
-        $q = (string) $this->request->getGet('q');
-        $b = $this->model->orderBy('nama_kategori', 'ASC');
-        if ($q !== '') {
-            $b = $b->search($q);
+        $qk = (string) $this->request->getGet('qk');
+        $qs = (string) $this->request->getGet('qs');
+
+        $kategori = $this->model->orderBy('nama_kategori', 'ASC');
+        if ($qk !== '') {
+            $kategori = $kategori->search($qk);
+        }
+
+        $satuan = $this->satuanModel->orderBy('nama_satuan', 'ASC');
+        if ($qs !== '') {
+            $satuan = $satuan->search($qs);
         }
 
         return view('categories/index', [
-            'title' => 'Kategori Barang',
-            'q'     => $q,
-            'rows'  => $b->paginate(10),
-            'pager' => $this->model->pager,
+            'title'    => 'Kategori & Satuan',
+            'qk'       => $qk,
+            'qs'       => $qs,
+            'kategori' => $kategori->findAll(),
+            'satuan'   => $satuan->findAll(),
         ]);
     }
 

@@ -17,7 +17,18 @@ class RolesFilter implements FilterInterface
 
         // CI4 melewatkan setiap token setelah ':' sebagai elemen terpisah di $arguments.
         // Contoh: 'roles:admin,petugas' → $arguments = ['admin', 'petugas']
-        $allowed = array_filter(array_map('trim', (array) ($arguments ?? [])));
+        // Loop + explode memastikan kompatibel dengan semua format penulisan filter.
+        $allowed = [];
+        foreach ($arguments ?? [] as $arg) {
+            foreach (explode(',', (string) $arg) as $role) {
+                $role = trim($role);
+                if ($role !== '') {
+                    $allowed[] = $role;
+                }
+            }
+        }
+        $allowed = array_values(array_unique($allowed));
+
 
         if ($allowed === []) {
             return null;

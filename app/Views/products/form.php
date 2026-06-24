@@ -24,7 +24,7 @@
                     <option value="<?= (int) $s['id_satuan'] ?>" <?= (string) old('id_satuan', $r['id_satuan'] ?? '') === (string) $s['id_satuan'] ? 'selected' : '' ?>><?= esc($s['nama_satuan']) ?></option>
                 <?php endforeach; ?>
             </select>
-            <p class="mt-1 text-xs text-neutral-500"><a href="<?= base_url('satuan') ?>" class="underline">Kelola master satuan</a></p>
+            <p class="mt-1 text-xs text-neutral-500"><a href="<?= base_url('categories') ?>" class="underline">Kelola kategori &amp; satuan</a></p>
         </div>
     </div>
     <div>

@@ -4,8 +4,11 @@ $canOps  = in_array($role, ['admin', 'petugas'], true);
 $isAdmin = $role === 'admin';
 $current = uri_string();
 
-$link = static function (string $path, string $label) use ($current): string {
-    $isActive = $current === $path || str_starts_with($current, $path . '/');
+$masterActive = $current === 'categories' || str_starts_with($current, 'categories/')
+    || $current === 'satuan' || str_starts_with($current, 'satuan/');
+
+$link = static function (string $path, string $label, ?bool $forceActive = null) use ($current, $masterActive): string {
+    $isActive = $forceActive ?? ($current === $path || str_starts_with($current, $path . '/'));
     $active   = $isActive
         ? 'border-l-[3px] border-amber-500 bg-white/5 pl-[13px] text-white'
         : 'border-l-[3px] border-transparent pl-[13px] text-stone-400 hover:bg-white/5 hover:text-stone-200';
@@ -24,8 +27,7 @@ $link = static function (string $path, string $label) use ($current): string {
         <?= $link('analysis', 'Analisis') ?>
         <?= $link('reports', 'Laporan') ?>
         <?php if ($canOps): ?>
-            <?= $link('categories', 'Kategori') ?>
-            <?= $link('satuan', 'Satuan') ?>
+            <?= $link('categories', 'Kategori & Satuan', $masterActive) ?>
             <?= $link('suppliers', 'Supplier') ?>
             <?= $link('products', 'Barang') ?>
             <?= $link('barang-masuk', 'Barang masuk') ?>

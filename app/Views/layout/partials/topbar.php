@@ -4,7 +4,10 @@ $role    = (string) (session()->get('user_role') ?? '');
 $canOps  = in_array($role, ['admin', 'petugas'], true);
 $isAdmin = $role === 'admin';
 
-$navActive = static fn (string $path): string => ($current === $path || str_starts_with($current, $path . '/'))
+$masterActive = $current === 'categories' || str_starts_with($current, 'categories/')
+    || $current === 'satuan' || str_starts_with($current, 'satuan/');
+
+$navActive = static fn (string $path, ?bool $forceActive = null): string => ($forceActive ?? ($current === $path || str_starts_with($current, $path . '/')))
     ? 'bg-stone-200/90 text-ink dark:bg-stone-700 dark:text-stone-100'
     : 'text-stone-600 hover:bg-stone-200/70 dark:text-stone-400 dark:hover:bg-stone-800';
 ?>
@@ -29,8 +32,7 @@ $navActive = static fn (string $path): string => ($current === $path || str_star
             <a class="rounded-md px-2 py-2 text-sm <?= $navActive('analysis') ?>" href="<?= base_url('analysis') ?>">Analisis</a>
             <a class="rounded-md px-2 py-2 text-sm <?= $navActive('reports') ?>" href="<?= base_url('reports') ?>">Laporan</a>
             <?php if ($canOps): ?>
-                <a class="rounded-md px-2 py-2 text-sm <?= $navActive('categories') ?>" href="<?= base_url('categories') ?>">Kategori</a>
-                <a class="rounded-md px-2 py-2 text-sm <?= $navActive('satuan') ?>" href="<?= base_url('satuan') ?>">Satuan</a>
+                <a class="rounded-md px-2 py-2 text-sm <?= $navActive('categories', $masterActive) ?>" href="<?= base_url('categories') ?>">Kategori &amp; Satuan</a>
                 <a class="rounded-md px-2 py-2 text-sm <?= $navActive('suppliers') ?>" href="<?= base_url('suppliers') ?>">Supplier</a>
                 <a class="rounded-md px-2 py-2 text-sm <?= $navActive('products') ?>" href="<?= base_url('products') ?>">Barang</a>
                 <a class="rounded-md px-2 py-2 text-sm <?= $navActive('barang-masuk') ?>" href="<?= base_url('barang-masuk') ?>">Masuk</a>

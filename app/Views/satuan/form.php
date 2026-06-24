@@ -9,7 +9,7 @@
     </div>
     <div class="flex gap-2">
         <button type="submit" class="rounded-sm bg-neutral-900 px-4 py-2 text-sm font-semibold text-white hover:bg-neutral-800">Simpan</button>
-        <a href="<?= base_url('satuan') ?>" class="rounded-lg border border-neutral-200 px-4 py-2 text-sm dark:border-neutral-600">Batal</a>
+        <a href="<?= base_url('categories') ?>" class="rounded-lg border border-neutral-200 px-4 py-2 text-sm dark:border-neutral-600">Batal</a>
     </div>
 </form>
 <?= $this->endSection() ?>
