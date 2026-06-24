@@ -42,7 +42,10 @@ $canOps = in_array($role, ['admin', 'petugas'], true);
                         <a href="<?= base_url('products/show/' . $row['id_barang']) ?>" class="text-neutral-900 hover:underline dark:text-white">Detail</a>
                         <?php if ($canOps): ?>
                             <a href="<?= base_url('products/edit/' . $row['id_barang']) ?>" class="text-neutral-700 hover:underline dark:text-neutral-300">Edit</a>
-                            <a href="<?= base_url('products/delete/' . $row['id_barang']) ?>" class="text-red-600 hover:underline dark:text-red-400" onclick="return confirm('Hapus barang ini?')">Hapus</a>
+                            <form method="post" action="<?= base_url('products/delete/' . $row['id_barang']) ?>" class="inline" onsubmit="return confirm('Hapus barang ini?')">
+                                <?= csrf_field() ?>
+                                <button type="submit" class="text-red-600 hover:underline dark:text-red-400 bg-transparent border-none p-0 cursor-pointer text-sm">Hapus</button>
+                            </form>
                         <?php endif; ?>
                     </td>
                 </tr>

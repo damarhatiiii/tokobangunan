@@ -15,8 +15,9 @@ class RolesFilter implements FilterInterface
             return redirect()->to('/login')->with('error', 'Silakan masuk terlebih dahulu.');
         }
 
-        $allowedRaw = $arguments[0] ?? '';
-        $allowed    = array_filter(array_map('trim', explode(',', (string) $allowedRaw)));
+        // CI4 melewatkan setiap token setelah ':' sebagai elemen terpisah di $arguments.
+        // Contoh: 'roles:admin,petugas' → $arguments = ['admin', 'petugas']
+        $allowed = array_filter(array_map('trim', (array) ($arguments ?? [])));
 
         if ($allowed === []) {
             return null;

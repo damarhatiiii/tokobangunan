@@ -31,7 +31,10 @@
                     <td class="px-4 py-3"><?= (int) $row['status_aktif'] === 1 ? 'Aktif' : 'Nonaktif' ?></td>
                     <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap">
                         <a href="<?= base_url('users/edit/' . $row['id_pengguna']) ?>" class="text-neutral-900 hover:underline dark:text-white">Edit</a>
-                        <a href="<?= base_url('users/delete/' . $row['id_pengguna']) ?>" class="text-red-600 hover:underline dark:text-red-400" onclick="return confirm('Hapus pengguna ini?')">Hapus</a>
+                        <form method="post" action="<?= base_url('users/delete/' . $row['id_pengguna']) ?>" class="inline" onsubmit="return confirm('Hapus pengguna ini?')">
+                            <?= csrf_field() ?>
+                            <button type="submit" class="text-red-600 hover:underline dark:text-red-400 bg-transparent border-none p-0 cursor-pointer text-sm">Hapus</button>
+                        </form>
                     </td>
                 </tr>
             <?php endforeach; ?>

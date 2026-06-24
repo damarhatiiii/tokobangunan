@@ -19,7 +19,10 @@
                     <td class="px-4 py-3 font-medium"><?= esc($row['nama_kategori']) ?></td>
                     <td class="px-4 py-3 text-right space-x-2">
                         <a href="<?= base_url('categories/edit/' . $row['id_kategori']) ?>" class="text-neutral-900 hover:underline dark:text-white">Edit</a>
-                        <a href="<?= base_url('categories/delete/' . $row['id_kategori']) ?>" class="text-red-600 hover:underline dark:text-red-400" onclick="return confirm('Hapus kategori ini?')">Hapus</a>
+                        <form method="post" action="<?= base_url('categories/delete/' . $row['id_kategori']) ?>" class="inline" onsubmit="return confirm('Hapus kategori ini?')">
+                            <?= csrf_field() ?>
+                            <button type="submit" class="text-red-600 hover:underline dark:text-red-400 bg-transparent border-none p-0 cursor-pointer text-sm">Hapus</button>
+                        </form>
                     </td>
                 </tr>
             <?php endforeach; ?>

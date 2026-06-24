@@ -91,21 +91,22 @@ class Sales extends BaseController
         }
 
         $db = Database::connect();
-        $db->transStart();
+        $db->transBegin();
 
-        $this->barang->update($idBarang, ['stok' => $current - $jumlah]);
+        try {
+            $this->barang->update($idBarang, ['stok' => $current - $jumlah]);
 
-        $this->keluar->insert([
-            'tanggal'     => $tanggal,
-            'id_barang'   => $idBarang,
-            'id_pengguna' => $userId,
-            'harga_jual'  => $hargaJual,
-            'jumlah'      => $jumlah,
-        ]);
+            $this->keluar->insert([
+                'tanggal'     => $tanggal,
+                'id_barang'   => $idBarang,
+                'id_pengguna' => $userId,
+                'harga_jual'  => $hargaJual,
+                'jumlah'      => $jumlah,
+            ]);
 
-        $db->transComplete();
-
-        if (! $db->transStatus()) {
+            $db->transCommit();
+        } catch (\Throwable $e) {
+            $db->transRollback();
             return redirect()->back()->withInput()->with('error', 'Gagal menyimpan barang keluar.');
         }
 

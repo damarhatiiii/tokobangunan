@@ -26,7 +26,10 @@
                     <td class="px-4 py-3 text-neutral-600 dark:text-neutral-400 hidden sm:table-cell"><?= esc($row['alamat'] ?? '') ?></td>
                     <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap">
                         <a href="<?= base_url('suppliers/edit/' . $row['id_supplier']) ?>" class="text-neutral-900 hover:underline dark:text-white">Edit</a>
-                        <a href="<?= base_url('suppliers/delete/' . $row['id_supplier']) ?>" class="text-red-600 hover:underline dark:text-red-400" onclick="return confirm('Hapus supplier ini?')">Hapus</a>
+                        <form method="post" action="<?= base_url('suppliers/delete/' . $row['id_supplier']) ?>" class="inline" onsubmit="return confirm('Hapus supplier ini?')">
+                            <?= csrf_field() ?>
+                            <button type="submit" class="text-red-600 hover:underline dark:text-red-400 bg-transparent border-none p-0 cursor-pointer text-sm">Hapus</button>
+                        </form>
                     </td>
                 </tr>
             <?php endforeach; ?>

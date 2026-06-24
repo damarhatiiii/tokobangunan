@@ -4,7 +4,15 @@
  * 1. Trim username pada tabel pengguna.
  * 2. Memperbaiki typo harga transaksi pada barang_masuk dan barang_keluar.
  * 3. Menghitung ulang stok barang berdasarkan mutasi masuk/keluar.
+ *
+ * HANYA boleh dijalankan via CLI:
+ *   php app/Database/sync_database.php
  */
+if (php_sapi_name() !== 'cli') {
+    http_response_code(403);
+    exit('Script ini hanya boleh dijalankan via CLI, bukan via browser.' . PHP_EOL);
+}
+
 
 $host = '127.0.0.1';
 $user = 'root';

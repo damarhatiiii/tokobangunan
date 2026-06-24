@@ -92,23 +92,24 @@ class BarangMasuk extends BaseController
         }
 
         $db = Database::connect();
-        $db->transStart();
+        $db->transBegin();
 
-        $newStock = (int) $product['stok'] + $jumlah;
-        $this->barang->update($idBarang, ['stok' => $newStock]);
+        try {
+            $newStock = (int) $product['stok'] + $jumlah;
+            $this->barang->update($idBarang, ['stok' => $newStock]);
 
-        $this->masuk->insert([
-            'tanggal'      => $tanggal,
-            'id_barang'    => $idBarang,
-            'id_supplier'  => $idSupplier,
-            'id_pengguna'  => $userId,
-            'harga_beli'   => $hargaBeli,
-            'jumlah'       => $jumlah,
-        ]);
+            $this->masuk->insert([
+                'tanggal'      => $tanggal,
+                'id_barang'    => $idBarang,
+                'id_supplier'  => $idSupplier,
+                'id_pengguna'  => $userId,
+                'harga_beli'   => $hargaBeli,
+                'jumlah'       => $jumlah,
+            ]);
 
-        $db->transComplete();
-
-        if (! $db->transStatus()) {
+            $db->transCommit();
+        } catch (\Throwable $e) {
+            $db->transRollback();
             return redirect()->back()->withInput()->with('error', 'Gagal menyimpan barang masuk.');
         }
 

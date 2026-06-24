@@ -20,11 +20,14 @@ class Dashboard extends BaseController
         $totalProducts = $barangModel->countAllResults();
         $totalSuppliers = (new SupplierModel())->countAllResults();
 
+        $lowStockCount = $barangModel->where('stok <=', self::LOW_STOCK_MAX)->countAllResults(false);
+
         $lowStock = $barangModel->withRelations()
             ->where('barang.stok <=', self::LOW_STOCK_MAX)
             ->orderBy('barang.stok', 'ASC')
-            ->limit(120)
+            ->limit(8)
             ->findAll();
+
 
         $monthStart = date('Y-m-01');
         $monthEnd   = date('Y-m-t');
@@ -117,8 +120,8 @@ SQL;
             'totalProducts'       => $totalProducts,
             'totalSuppliers'      => $totalSuppliers,
             'categoriesCount'     => (new CategoryModel())->countAllResults(),
-            'lowStockCount'       => count($lowStock),
-            'lowStock'            => array_slice($lowStock, 0, 8),
+            'lowStockCount'       => $lowStockCount,
+            'lowStock'            => $lowStock,
             'lowStockMax'         => self::LOW_STOCK_MAX,
             'stockValue'          => $stockValue,
             'chartLabels'         => $chartLabels,

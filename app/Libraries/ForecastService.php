@@ -25,18 +25,25 @@ class ForecastService
         $start = date('Y-m-d', strtotime("-{$lookbackDays} days"));
 
         $rows = $this->barang->withRelations()->orderBy('barang.nama_barang', 'ASC')->findAll();
-        $out  = [];
 
+        // Satu query untuk semua barang sekaligus (menggantikan N query individual)
+        $salesRaw = $db->table('barang_keluar')
+            ->select('id_barang, SUM(jumlah) AS qty')
+            ->where('tanggal >=', $start)
+            ->where('tanggal <=', $end)
+            ->groupBy('id_barang')
+            ->get()
+            ->getResultArray();
+
+        $salesMap = [];
+        foreach ($salesRaw as $s) {
+            $salesMap[(int) $s['id_barang']] = (int) $s['qty'];
+        }
+
+        $out = [];
         foreach ($rows as $p) {
-            $pid = (int) $p['id_barang'];
-            $sum = $db->table('barang_keluar')
-                ->selectSum('jumlah', 'qty')
-                ->where('id_barang', $pid)
-                ->where('tanggal >=', $start)
-                ->where('tanggal <=', $end)
-                ->get()
-                ->getRowArray();
-            $totalQty = (int) ($sum['qty'] ?? 0);
+            $pid      = (int) $p['id_barang'];
+            $totalQty = $salesMap[$pid] ?? 0;
             $avgDaily = $lookbackDays > 0 ? ($totalQty / $lookbackDays) : 0.0;
             $forecast = (int) ceil($avgDaily * $horizonDays);
             $stock    = (int) $p['stok'];
@@ -58,6 +65,7 @@ class ForecastService
 
         return $out;
     }
+
 
     /** @return list<array<string, mixed>> */
     public function topSelling(int $limit = 8, int $lookbackDays = 90): array
